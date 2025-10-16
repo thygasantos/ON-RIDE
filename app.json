@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ON",
+    "name": "ON-RIDE",
     "userInterfaceStyle": "automatic",
     "version": "1.0.0",
     "jsEngine": "jsc",
@@ -16,7 +16,7 @@
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/73e4fd0e-a8c9-446d-a045-6be2870150b8"
+      "url": "https://u.expo.dev/229a3f45-e7df-4523-aed2-d3510ebea738"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -61,7 +61,7 @@
     "extra": {
       "firebaseServerKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC0goOK3c6OLRsl",
       "eas": {
-        "projectId": "73e4fd0e-a8c9-446d-a045-6be2870150b8"
+        "projectId": "229a3f45-e7df-4523-aed2-d3510ebea738"
       }
     },
     "plugins": [

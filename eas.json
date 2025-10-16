@@ -1,0 +1,34 @@
+{
+  "cli": {
+    "version": ">= 6.0.0"
+  },
+  "build": {
+    "development": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug"
+      },
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview"
+    },
+    "production": {
+      "channel": "production",
+      "cache": {
+            "disabled": true
+      },
+      "env": {
+          "GOOGLE_MAPS_API_KEY": "AIzaSyC3RtmZThaQj7nVzyXCkEs4o3AShvMNj4E",
+          "GOOGLE_CLIENT_ID": "656904332501-4k37m1l04q7kht42savadht3j6ggu6cn.apps.googleusercontent.com"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}

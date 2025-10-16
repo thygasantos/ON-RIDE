@@ -1,0 +1,112 @@
+{
+  "expo": {
+    "name": "ON",
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
+    "jsEngine": "jsc",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "runtimeVersion": "1.0.0",
+    "owner": "thyagom",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/73e4fd0e-a8c9-446d-a045-6be2870150b8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.on.beta"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "googleServicesFile": "./google-services.json",
+      "package": "com.on.beta",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC3RtmZThaQj7nVzyXCkEs4o3AShvMNj4E"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "INTERNET",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "NOTIFICATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "FOREGROUND_SERVICE",
+        "MANAGE_EXTERNAL_STORAGE",
+        "SYSTEM_ALERT_WINDOW"
+      ]
+    },
+    "extra": {
+      "firebaseServerKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC0goOK3c6OLRsl",
+      "eas": {
+        "projectId": "73e4fd0e-a8c9-446d-a045-6be2870150b8"
+      }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location.",
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to access your location."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification.png",
+          "color": "#000000",
+          "sounds": [
+            "./assets/notification.wav"
+          ]
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      "expo-asset",
+      "expo-localization"
+    ]
+  }
+}

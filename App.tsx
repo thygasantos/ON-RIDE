@@ -100,7 +100,7 @@ export default function App() {
     try {
       // Assuming you have a user ID from your auth system
       const userId = userData._id; // Replace with actual user ID (e.g., from login)
-      await axios.post('http://your-backend-url/api/store-player-id', {
+      await axios.post('https://on-host-api.vercel.app/api/store-player-id', {
         userId: userData._id,
         playerId,
       });

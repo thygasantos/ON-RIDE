@@ -505,7 +505,7 @@ export default function dashboard({ route, navigation }) {
         {/* BottomSheet */}
         <BottomSheet isOpen index={0} enableHandlePanningGesture={false} enableContentPanningGesture={false} enablePanDownToClose={false} sliderMinHeight={'135'}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", alignContent: "center" }}>
-            <MaterialCommunityIcons name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
+            <MaterialCommunityIcons onPress={() => navigation.push('Options')}  name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
             {connect ? (
               <Animated.View style={{
                 transform: [{ scale: pulseAnim }],
@@ -533,7 +533,7 @@ export default function dashboard({ route, navigation }) {
                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 25, textAlign: 'center' }}>CONNECT</Text>
               </TouchableOpacity>
             )}
-            <MaterialIcons name="feed" size={55} color="black" style={{ marginLeft: 10 }} />
+            <MaterialIcons onPress={() => navigation.push('Feed')} name="feed" size={55} color="black" style={{ marginLeft: 10 }} />
           </View>
         </BottomSheet>
       </View>

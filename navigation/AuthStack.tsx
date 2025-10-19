@@ -17,7 +17,6 @@ import Feed from '@/screens/request/feed';
 import Options from '@/screens/request/options';
 import Vehicles from '@/screens/settings/Vehicles';
 import AddVehicles from '@/screens/settings/AddAuto';
-import Card from '@/screens/settings/add-card';
 
 
 import AppStack from './AppStack';
@@ -46,7 +45,6 @@ const AuthStack = ({props}) => {
       <Stack.Screen name="AddVehicles" component={AddVehicles} options={{ title: 'Add Vehicles',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="about" component={AboutScreen} options={{ title: 'About',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="privacy" component={privacyScreen} options={{ title: 'Privacy Policy', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
-      <Stack.Screen name="addcard" component={Card} options={{ title: 'ADD CARD', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="PaymentSuccess" component={() => <Text>Payment Success</Text>} />
       <Stack.Screen name="PaymentCancel" component={() => <Text>Payment Cancelled</Text>} />
     </Stack.Navigator>

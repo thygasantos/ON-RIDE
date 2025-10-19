@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef, useContext, useCallback, useMemo } from 'react';
 import {
   ScrollView,
   Button,
@@ -14,6 +14,7 @@ import {
   Pressable,
   Platform,
   TouchableOpacity,
+  Modal,
   Animated,
   Easing
 } from "react-native";
@@ -73,9 +74,15 @@ export default function dashboard({ route, navigation }) {
   const [locationServicesEnabled, setLocationServicesEnabled] = useState(false);
   const [categorys, setCategorys] = useState([]);
   const [destination, setDestination] = useState(route.params?.infoplace || '');
+  const [visible, setVisible] = useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
 
   const mapRef = useRef(null);
+  const lastFetchRef = useRef(0);
+  const fetchIntervalRef = useRef(null);
+
   // Pulse animation setup
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -470,6 +477,45 @@ export default function dashboard({ route, navigation }) {
     })();
   }, [requestdata, requestId]);
 
+
+    // ---------- request fetching / polling ----------
+  const fetchRequests = useCallback(async () => {
+    // simple rate limiter: don't fetch more than once every 3s
+    const now = Date.now();
+    if (now - lastFetchRef.current < 3000) return;
+    lastFetchRef.current = now;
+
+    if (!latitude || !longitude) return;
+    try {
+      const res = await axios.get(`https://on-host-api.vercel.app/requests/process`, {
+        params: { latitude, longitude, max_km: 10 },
+        timeout: 100,
+      });
+      const data = res.data?.data || [];
+      if (data.length > 0 && !modalVisible) {
+        setCurrentRequest(data[0]);
+        setRequestId(data[0]._id);
+        setVisible(true);
+      }
+    } catch (err) {
+      console.warn('fetchRequests', err?.message || err);
+    }
+  }, [latitude, longitude, visible]);
+
+  const startFetchInterval = useCallback(() => {
+    if (fetchIntervalRef.current) return;
+    fetchIntervalRef.current = setInterval(() => {
+      fetchRequests();
+    }, 5000);
+  }, [fetchRequests]);
+
+  const stopFetchInterval = useCallback(() => {
+    if (fetchIntervalRef.current) {
+      clearInterval(fetchIntervalRef.current);
+      fetchIntervalRef.current = null;
+    }
+  }, []);
+  
   return (
     <View style={{ flex: 1 }}>
       <View style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, }}>
@@ -537,6 +583,33 @@ export default function dashboard({ route, navigation }) {
           </View>
         </BottomSheet>
       </View>
+      <Modal animationType="slide" transparent visible={visible} onRequestClose={() => setVisible(false)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>New Request!</Text>
+            {currentRequest ? (
+              <>
+                <Text>Destination: {currentRequest.d_info}</Text>
+                <Text>Distance: {currentRequest.distance} km</Text>
+                <Text>Time: {currentRequest.time} min</Text>
+                <Text>Value: {currentRequest.valor} {currentRequest.moeda}</Text>
+                <Text>Payment: {currentRequest.pagamento}</Text>
+              </>
+            ) : (
+              <ActivityIndicator />
+            )}
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Pressable style={[styles.button, styles.buttonAccept]} onPress={() => acceptRequest(currentRequest)}>
+                <Text style={styles.textStyle}>Accept</Text>
+              </Pressable>
+              <Pressable style={[styles.button, styles.buttonDecline]} onPress={() => setModalVisible(false)}>
+                <Text style={styles.textStyle}>Decline</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -544,9 +617,7 @@ export default function dashboard({ route, navigation }) {
 const styles = StyleSheet.create({
   cardContainer: {
     width: SCREEN_WIDTH * 0.8,
-    top: 0,
     marginVertical: 8,
-    textAlign: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -554,12 +625,10 @@ const styles = StyleSheet.create({
     padding: 15,
     alignSelf: 'center',
     borderRadius: 10,
-    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    zIndex: 0,
   },
   cardText: {
     color: 'black',
@@ -568,4 +637,23 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  connectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0400ffff',
+    padding: 10,
+    borderRadius: 50,
+    width: SCREEN_WIDTH * 0.6,
+    height: SCREEN_HEIGHT * 0.08,
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  disabledButton: { backgroundColor: '#A0A0A0' },
+  centeredView: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 22 },
+  modalView: { margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', elevation: 5 },
+  button: { borderRadius: 20, padding: 10, elevation: 2, margin: 10 },
+  buttonAccept: { backgroundColor: '#2196F3' },
+  buttonDecline: { backgroundColor: '#FF0000' },
+  textStyle: { color: 'white', fontWeight: 'bold', textAlign: 'center' },
+  modalText: { marginBottom: 15, textAlign: 'center', fontSize: 20, fontWeight: 'bold' },
 });

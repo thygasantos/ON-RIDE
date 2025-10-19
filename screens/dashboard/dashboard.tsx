@@ -447,7 +447,7 @@ export default function dashboard({ route, navigation }) {
         </View>
 
 
-        <BottomSheet isOpen sliderMinHeight={'55'} > {/* Add state control if needed, e.g., isOpen={bottomSheetVisible} */}
+        <BottomSheet isOpen index={0} enableHandlePanningGesture={false} enableContentPanningGesture={false} enablePanDownToClose={false} sliderMinHeight={'135'} > {/* Add state control if needed, e.g., isOpen={bottomSheetVisible} */}
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", alignContent: "center" }}>
           <MaterialCommunityIcons name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
           <TouchableOpacity onPress={() => handleNavigate()} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0400ffff', padding: 10, borderRadius: 50, width: SCREEN_WIDTH * 0.6, height: SCREEN_HEIGHT * 0.08, justifyContent: 'center', marginBottom: 10 }}>  

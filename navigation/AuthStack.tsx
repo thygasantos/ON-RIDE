@@ -15,7 +15,8 @@ import Seach from '@/screens/request/seach';
 import Cancel from '@/screens/request/cancel';
 import Feed from '@/screens/request/feed';
 import Options from '@/screens/request/options';
-
+import Vehicles from '@/screens/settings/Vehicles';
+import AddVehicles from '@/screens/settings/AddAuto';
 import Card from '@/screens/settings/add-card';
 
 
@@ -41,7 +42,8 @@ const AuthStack = ({props}) => {
       <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true }} />
       <Stack.Screen name="editaccount" component={EditaccountScreen}  options={{ title: 'Edit Account', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true }} />
       <Stack.Screen name="editpass" component={EditPassScreen} options={{ title: 'Edit Password',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
-      <Stack.Screen name="editcode" component={EditCodeScreen} options={{ title: 'Edit Code Security',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
+      <Stack.Screen name="Vehicles" component={Vehicles} options={{ title: 'Vehicles',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
+      <Stack.Screen name="AddVehicles" component={AddVehicles} options={{ title: 'Add Vehicles',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="about" component={AboutScreen} options={{ title: 'About',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="privacy" component={privacyScreen} options={{ title: 'Privacy Policy', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />
       <Stack.Screen name="addcard" component={Card} options={{ title: 'ADD CARD', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />

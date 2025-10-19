@@ -8,31 +8,33 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   Image,
   KeyboardAvoidingView,
   TextInput,
   Pressable,
   Platform,
-  TouchableOpacity,  // Added this import
+  TouchableOpacity,
+  Animated,
+  Easing
 } from "react-native";
 import { OriginContext, DestinationContext } from '@/context/contexts';
-import React from 'react'
 import BottomSheet from 'react-native-simple-bottom-sheet';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { LatLng, PROVIDER_GOOGLE } from 'react-native-maps';
-import Icon from '@expo/vector-icons';
 import * as Location from "expo-location";
 import * as Updates from "expo-updates";
 import axios from 'axios';
-import { Marker } from "react-native-maps";
 import MapQuestAutocomplete from '@/components/MapQuestAutocomplete';
 import Config from "react-native-config";
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync, LocationObject, LocationAccuracy } from "expo-location";
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync, watchPositionAsync, LocationAccuracy } from "expo-location";
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
+import * as Linking from 'expo-linking';
+import Toast from 'react-native-toast-message';
+import * as Network from "expo-network";
+import React from 'react';
 
 
 const GOOGLE_MAPS_APIKEY = 'pk.eyJ1IjoidGh5YWdvIiwiYSI6IlgyYnFZa3cifQ.sm008NJiQD9tNZHfXpu3EA';
@@ -48,27 +50,59 @@ export default function dashboard({ route, navigation }) {
   const [userId, setUserId] = useState('');
   const [requests, setRequests] = useState([]);
   const [requestId, setRequestId] = useState('');
-  const [requestdata, setRequestData] = useState('');
+  const [requestData, setRequestData] = useState('');
   const [categoryData, setCategoryData] = useState([]);
   const [dns, setIpAddress] = useState('');
+  const [zoom, setZoom] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [location, setLocation] = useState(null);
   const [origin, setOrigin] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [region, setRegion_code] = useState('');
+  const [error, setError] = useState("");
+  const [connect, setConnect] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isNetworkAvailable, setIsNetworkAvailable] = useState(true);
+  const [region, setRegion] = useState('');
   const [country, setCountry] = useState('');
   const [moeda, setCurrency] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
-  const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading.....');
+  const [displayCurrentAddress, setDisplayCurrentAddress] = useState('Location Loading...');
   const [locationServicesEnabled, setLocationServicesEnabled] = useState(false);
   const [categorys, setCategorys] = useState([]);
-  const position = { lat: 53.54992, lng: 10.00678 };
-  const mapRef = useRef<MapView>(null);
   const [destination, setDestination] = useState(route.params?.infoplace || '');
 
+
+  const mapRef = useRef(null);
+  // Pulse animation setup
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  // Pulse effect for "SEARCHING" state
+  useEffect(() => {
+    if (connect) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.2,
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1); // Reset scale when not pulsing
+    }
+  }, [connect]);
+  
 
   const handleSelect = async (place: any) => {
     console.log('Selected place:', place);
@@ -144,6 +178,27 @@ export default function dashboard({ route, navigation }) {
   function handleNavigate() {
     navigation.push("Category");
   }
+
+
+  useEffect(() => {
+    const checkNetwork = async () => {
+      try {
+        const networkState = await Network.getNetworkStateAsync();
+        setIsNetworkAvailable(networkState.isConnected);
+        if (!networkState.isConnected) {
+          setError("No internet connection");
+          Toast.show({
+            type: "error",
+            text1: "No Internet",
+            text2: "Please check your network connection.",
+          });
+        }
+      } catch (err) {
+        console.error("Network check error:", err);
+      }
+    };
+    checkNetwork();
+  }, []);
 
   const myListEmpty = () => {
     return (
@@ -416,7 +471,7 @@ export default function dashboard({ route, navigation }) {
   }, [requestdata, requestId]);
 
   return (
-    <SafeAreaView>
+    <View style={{ flex: 1 }}>
       <View style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, }}>
         <View style={{ borderRadius: 50, backgroundColor: 'white', elevation: 10, zIndex: 10, flexWrap: 'wrap' }}>
           <View style={{ width: 55, height: 55, position: 'absolute', top: 32, elevation: 10, backgroundColor: "white", marginTop: 40, marginLeft: 50, borderRadius: 50, zIndex: 10 }} >
@@ -447,17 +502,42 @@ export default function dashboard({ route, navigation }) {
         </View>
 
 
-        <BottomSheet isOpen index={0} enableHandlePanningGesture={false} enableContentPanningGesture={false} enablePanDownToClose={false} sliderMinHeight={'135'} > {/* Add state control if needed, e.g., isOpen={bottomSheetVisible} */}
-        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", alignContent: "center" }}>
-          <MaterialCommunityIcons name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
-          <TouchableOpacity onPress={() => handleNavigate()} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0400ffff', padding: 10, borderRadius: 50, width: SCREEN_WIDTH * 0.6, height: SCREEN_HEIGHT * 0.08, justifyContent: 'center', marginBottom: 10 }}>  
-            <Text style={{ color: 'white', width: 'bold', fontSize: 25, textAlign: 'center',  }}>CONNECT</Text>
-          </TouchableOpacity>
-          <MaterialIcons name="feed" size={55} color="black" style={{ marginLeft: 10 }} />
-        </View>
+        {/* BottomSheet */}
+        <BottomSheet isOpen index={0} enableHandlePanningGesture={false} enableContentPanningGesture={false} enablePanDownToClose={false} sliderMinHeight={'135'}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", alignContent: "center" }}>
+            <MaterialCommunityIcons name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
+            {connect ? (
+              <Animated.View style={{
+                transform: [{ scale: pulseAnim }],
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: 30,
+                shadowColor: '#00ff0dff',
+                shadowOffset: { width: 1, height: 2 },
+                shadowOpacity: 0.6,
+                shadowRadius: 50,
+                elevation: 5,
+                backgroundColor: '#00ff0d1a',
+                borderRadius: 50,
+                paddingHorizontal: 30,
+                paddingVertical: 10,
+              }}>
+                <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 25, textAlign: 'center' }}>SEARCHING</Text>
+              </Animated.View>
+            ) : (
+              <TouchableOpacity
+                disabled={isLoading || !isNetworkAvailable}
+                onPress={() => handleConnect()}
+                style={[styles.connectButton, isLoading && styles.disabledButton]}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 25, textAlign: 'center' }}>CONNECT</Text>
+              </TouchableOpacity>
+            )}
+            <MaterialIcons name="feed" size={55} color="black" style={{ marginLeft: 10 }} />
+          </View>
         </BottomSheet>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

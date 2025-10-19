@@ -23,14 +23,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.on.beta"
+      "bundleIdentifier": "com.on.ride"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.on.beta",
+      "package": "com.on.ride",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyC3RtmZThaQj7nVzyXCkEs4o3AShvMNj4E"

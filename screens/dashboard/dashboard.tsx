@@ -447,36 +447,14 @@ export default function dashboard({ route, navigation }) {
         </View>
 
 
-        <BottomSheet isOpen >
-          <View style={{ width: 45, height: 45, marginStart: 270, alignSelf: 'stretch', position: 'absolute', top: -250, elevation: 10, zIndex: 10, flexWrap: 'wrap', borderRadius: 50, borderWidth: 1, backgroundColor: 'white' }}>
-            <TouchableOpacity onPress={handleZoomIn} style={{ marginTop: 5, marginLeft: 6 }}>
-              <MaterialIcons size={34} name='zoom-in' color="black" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ width: 45, height: 45, marginStart: 270, alignSelf: 'stretch', position: 'absolute', top: -185, elevation: 10, zIndex: 10, flexWrap: 'wrap', borderRadius: 50, borderWidth: 1, backgroundColor: 'white' }}>
-            <TouchableOpacity onPress={handleZoomOut} style={{ marginTop: 5, marginLeft: 6 }}>
-              <MaterialIcons size={34} name='zoom-out' color="black" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ width: 48, height: 48, marginStart: 270, alignSelf: 'stretch', position: 'absolute', top: -120, elevation: 10, zIndex: 10, flexWrap: 'wrap', borderRadius: 50, borderWidth: 1, backgroundColor: 'white' }}>
-            <TouchableOpacity onPress={handleCamera} style={{ marginTop: 5, marginLeft: 6 }}>
-              <FontAwesome6 size={34} name='location-crosshairs' color="black" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginTop: -30, alignItems: "center" }}>
-            <View style={{ justifyContent: 'center', height: 250, width: SCREEN_WIDTH, margin: 30, padding: 10, zIndex: 20 }}>
-              <MapQuestAutocomplete onSelect={handleSelect} />
-              <FlatList
-                style={{ marginTop: 10, zIndex: 0, height: 250 }}
-                data={requests}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={myListEmpty}
-                keyExtractor={item => item._id}
-                renderItem={({ item }) => <RequestCard data={item} />}
-                onTouchMove={handleLoadMore}
-              />
-            </View>
-          </View>
+        <BottomSheet isOpen sliderMinHeight={'55'} > {/* Add state control if needed, e.g., isOpen={bottomSheetVisible} */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", alignContent: "center" }}>
+          <MaterialCommunityIcons name="square-edit-outline" size={55} color="black" style={{ marginRight: 10 }} />
+          <TouchableOpacity onPress={() => handleNavigate()} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#0400ffff', padding: 10, borderRadius: 50, width: SCREEN_WIDTH * 0.6, height: SCREEN_HEIGHT * 0.08, justifyContent: 'center', marginBottom: 10 }}>  
+            <Text style={{ color: 'white', width: 'bold', fontSize: 25, textAlign: 'center',  }}>CONNECT</Text>
+          </TouchableOpacity>
+          <MaterialIcons name="feed" size={55} color="black" style={{ marginLeft: 10 }} />
+        </View>
         </BottomSheet>
       </View>
     </SafeAreaView>

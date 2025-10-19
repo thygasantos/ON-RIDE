@@ -8,6 +8,7 @@ import { Entypo } from '@expo/vector-icons';
 import { Switch } from 'react-native-paper';
 import editaccount from '@/screens/settings/editaccount';
 import editpass from '@/screens/settings/editpass';
+import Vehicles from '@/screens/settings/Vehicles';
 import editcode from '@/screens/settings/editcode';
 import about from '@/screens/settings/about';
 import privacy from '@/screens/settings/privacy';
@@ -59,7 +60,7 @@ export default function settings({navigation}) {
         </TouchableOpacity>
 
         <TouchableOpacity 
-          onPress={() => navigation.push("editcode")} 
+          onPress={() => navigation.navigate(Vehicles)} 
           style={{
             width: SCREEN_WIDTH * 0.9, 
             height: 60, 
@@ -71,8 +72,8 @@ export default function settings({navigation}) {
             marginBottom: 10
           }}
         >
-          <MaterialCommunityIcons style={{ marginRight: 10 }} size={40} name='database-lock' color="black"/>
-          <Text style={{ fontWeight: 'bold', fontSize: 25, flex: 1 }}>Edit Code</Text>
+          <MaterialCommunityIcons style={{ marginRight: 10 }} size={40} name='car-cog' color="black"/>
+          <Text style={{ fontWeight: 'bold', fontSize: 25, flex: 1 }}>Vehicles</Text>
           <AntDesign size={40} name='right' color="black"/>
         </TouchableOpacity>
 

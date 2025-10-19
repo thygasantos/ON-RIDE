@@ -11,6 +11,7 @@ import AuthStack from '@/navigation/AuthStack';
 import AppStack from '@/navigation/AppStack';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { OneSignal, LogLevel } from 'react-native-onesignal';
 import axios from "axios";
 import Constants from "expo-constants";
 
@@ -68,6 +69,46 @@ export default function App() {
     }
     updateApp();
   }, []);
+
+
+  useEffect(() => {
+    // Enable verbose logging for debugging (remove in production)
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+    // Initialize with your OneSignal App ID
+    OneSignal.initialize('3fb4d651-5574-4962-aeec-87a7e792db3b');
+
+    // Prompt for push permissions (recommend using In-App Messages for better UX instead of immediate prompt)
+    OneSignal.Notifications.requestPermission(true);
+
+    // Listen for changes in user subscription
+    const subscriptionListener = OneSignal.User.addEventListener('change', (user) => {
+      const playerId = user.pushSubscription.id;
+      if (playerId) {
+        console.log('Player ID:', playerId);
+        // Send player ID to your backend for storage (associate with user)
+        sendPlayerIdToBackend(playerId);
+      }
+    });
+
+    // Clean up listener on unmount
+    return () => OneSignal.User.removeEventListener('change', subscriptionListener);
+  }, []);
+
+
+  const sendPlayerIdToBackend = async (playerId: string) => {
+    try {
+      // Assuming you have a user ID from your auth system
+      const userId = userData._id; // Replace with actual user ID (e.g., from login)
+      await axios.post('http://your-backend-url/api/store-player-id', {
+        userId: userData._id,
+        playerId,
+      });
+      console.log('Player ID sent to backend');
+    } catch (error) {
+      console.error('Error sending player ID:', error);
+    }
+  };
 
 
   // Register for push notifications

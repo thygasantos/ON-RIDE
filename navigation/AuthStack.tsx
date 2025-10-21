@@ -15,7 +15,7 @@ import Seach from '@/screens/request/seach';
 import Cancel from '@/screens/request/cancel';
 import Feed from '@/screens/request/feed';
 import Options from '@/screens/request/options';
-import Vehicles from '@/screens/settings/Vehicles';
+import Vehicles from '@/screens/settings/[Vehicles]';
 import AddVehicles from '@/screens/settings/AddAuto';
 
 

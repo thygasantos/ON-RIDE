@@ -15,6 +15,7 @@ import Seach from '@/screens/request/seach';
 import Cancel from '@/screens/request/cancel';
 import Feed from '@/screens/request/feed';
 import Options from '@/screens/request/options';
+import Request from '@/screens/request/request';
 import Vehicles from '@/screens/settings/[Vehicles]';
 import AddVehicles from '@/screens/settings/AddAuto';
 
@@ -38,6 +39,7 @@ const AuthStack = ({props}) => {
       <Stack.Screen name="Cancel" component={Cancel} />
       <Stack.Screen name="Feed" component={Feed} options={{ title: 'Feed Requests',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
       <Stack.Screen name="Options" component={Options} options={{ title: 'Options',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
+      <Stack.Screen name="Request" component={Request} options={{ title: 'Request',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
       <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true }} />
       <Stack.Screen name="editaccount" component={EditaccountScreen}  options={{ title: 'Edit Account', headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true }} />
       <Stack.Screen name="editpass" component={EditPassScreen} options={{ title: 'Edit Password',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }} />

@@ -15,8 +15,6 @@ import { OneSignal, LogLevel } from 'react-native-onesignal';
 import axios from "axios";
 import Constants from "expo-constants";
 
-
-
 // Configure notification handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -26,32 +24,39 @@ Notifications.setNotificationHandler({
   }),
 });
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 10,  // Tenta refetch 2 vezes em caso de erro
+      retry: 10,
       staleTime: 1000 * 60 * 5,
     },
   },
 });
 
+interface UserData {
+  _id?: string;
+  [key: string]: any;
+}
+
 export default function App() {
   const { token, authState } = useContext(AuthContext);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState('');
-  const [userData, setUserData] = useState('');
-
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   async function getData() {
-    const token = await AsyncStorage.getItem('token');
-    console.log(token);
-    axios
-      .post('https://on-host-api.vercel.app/userdata', { token: token })
-      .then(res => {
-        console.log(res.data);
-        setUserData(res.data.data);
-      });
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        console.log('No token found');
+        return;
+      }
+      
+      const response = await axios.post('https://on-host-api.vercel.app/userdata', { token });
+      setUserData(response.data.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
   }
 
   useEffect(() => {
@@ -60,141 +65,74 @@ export default function App() {
 
   useEffect(() => {
     async function updateApp() {
-      const { isAvailable } = await Updates.checkForUpdateAsync();
-      if (isAvailable) {
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync(); // depende da sua estratégia
+      try {
+        const { isAvailable } = await Updates.checkForUpdateAsync();
+        if (isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        console.error('Error checking updates:', error);
+      } finally {
+        setIsCheckingUpdates(false);
       }
-      setIsCheckingUpdates(false);
     }
     updateApp();
   }, []);
 
-
   useEffect(() => {
-    // Enable verbose logging for debugging (remove in production)
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-
-    // Initialize with your OneSignal App ID
     OneSignal.initialize('3fb4d651-5574-4962-aeec-87a7e792db3b');
-
-    // Prompt for push permissions (recommend using In-App Messages for better UX instead of immediate prompt)
     OneSignal.Notifications.requestPermission(true);
 
-    // Listen for changes in user subscription
     const subscriptionListener = OneSignal.User.addEventListener('change', (user) => {
       const playerId = user.pushSubscription.id;
-      if (playerId) {
-        console.log('Player ID:', playerId);
-        // Send player ID to your backend for storage (associate with user)
-        sendPlayerIdToBackend(playerId);
+      if (playerId && userData?._id) {
+        sendPlayerIdToBackend(playerId, userData._id);
       }
     });
 
-    // Clean up listener on unmount
     return () => OneSignal.User.removeEventListener('change', subscriptionListener);
-  }, []);
+  }, [userData]);
 
+  const sendPlayerIdToBackend = async (playerId: string, userId: string) => {
+    const maxRetries = 3;
+    let retryCount = 0;
 
-  const sendPlayerIdToBackend = async (playerId: string) => {
-    try {
-      // Assuming you have a user ID from your auth system
-      const userId = userData._id; // Replace with actual user ID (e.g., from login)
-      await axios.post('https://on-host-api.vercel.app/api/store-player-id', {
-        userId: userData._id,
-        playerId,
-      });
-      console.log('Player ID sent to backend');
-    } catch (error) {
-      console.error('Error sending player ID:', error);
-    }
-  };
-
-
-  // Register for push notifications
-  useEffect(() => {
-    async function registerForPushNotifications() {
+    while (retryCount < maxRetries) {
       try {
-        // Set Android notification channel
-        if (Platform.OS === 'android') {
-          await Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-          });
-        }
-
-        // Request permissions
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
+        await axios.post('https://on-host-api.vercel.app/api/store-player-id', {
+          userId,
+          playerId,
+        }, {
+          timeout: 5000, // 5 second timeout
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` })
+          }
+        });
+        
+        console.log('Player ID successfully sent to backend');
+        return;
+      } catch (error) {
+        retryCount++;
+        console.error(`Attempt ${retryCount} failed to send player ID:`, error);
+        
+        if (retryCount === maxRetries) {
           Toast.show({
-            type: "error",
-            text1: "Permissões Negadas",
-            text2: "Não foi possível obter permissões para notificações.",
+            type: 'error',
+            text1: 'Notification Setup Failed',
+            text2: 'Failed to register for notifications. Please try again later.',
           });
           return;
         }
-
-        // Get the Expo push token
-        const projectId =
-          Constants?.expoConfig?.extra?.eas?.projectId ??
-          Constants?.easConfig?.projectId;
-        if (!projectId) {
-          Toast.show({
-            type: "error",
-            text1: "Notification project ID not found.",
-          });
-          return false;
-        }
-
-        // Get Expo push token
-        const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
-        setExpoPushToken(tokenData.data);
-        console.log('Expo Push Token:', tokenData.data);
-
-        // Send token to backend
-        if (tokenData.data && userData._id) { // Ensure userId exists
-          try {
-            const response = await fetch('https://on-host-api.vercel.app/api/register-token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token: tokenData.data, userId: userData._id }),
-            });
-            if (!response.ok) {
-              throw new Error('Failed to register token with backend');
-            }
-            console.log('Token registered with backend');
-          } catch (error) {
-            console.error('Failed to send push token to backend:', error);
-            Toast.show({
-              type: "error",
-              text1: "Erro de Registro",
-              text2: "Não foi possível registrar o token de notificação.",
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Push notification registration failed:", error);
-        Toast.show({
-          type: "error",
-          text1: "Erro de Notificação",
-          text2: "Falha ao registrar notificações push.",
-        });
+        
+        // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
       }
     }
+  };
 
-    registerForPushNotifications();
-  }, [userData]); // Re-run if userId changes
-
-  // Loading state for updates
   if (isCheckingUpdates) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -203,7 +141,6 @@ export default function App() {
     );
   }
 
-  // Main app rendering
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>

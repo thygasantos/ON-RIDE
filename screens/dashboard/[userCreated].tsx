@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#2e7d32",
     marginTop: -35,
-    marginLeft: 190,
+    marginLeft: 180,
     alignSelf: "flex-end",
   },
   currency: {

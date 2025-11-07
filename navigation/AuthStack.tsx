@@ -11,6 +11,7 @@ import AboutScreen from '@/screens/settings/about';
 import privacyScreen from '@/screens/settings/privacy';
 import Confirm from '@/screens/request/confirm';
 import Category from '@/screens/request/category';
+import Pick from '@/screens/request/pick';
 import Seach from '@/screens/request/seach';
 import Cancel from '@/screens/request/cancel';
 import Feed from '@/screens/request/feed';
@@ -37,6 +38,7 @@ const AuthStack = ({props}) => {
       <Stack.Screen name="Confirm" component={Confirm} />
       <Stack.Screen name="Seach" component={Seach} />
       <Stack.Screen name="Cancel" component={Cancel} />
+      <Stack.Screen name="Pick" component={Pick} />
       <Stack.Screen name="Feed" component={Feed} options={{ title: 'Feed Requests',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
       <Stack.Screen name="Options" component={Options} options={{ title: 'Options',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
       <Stack.Screen name="Request" component={Request} options={{ title: 'Request',headerStyle: { backgroundColor: 'black' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: 'bold' }, headerShown: true  }}  />
